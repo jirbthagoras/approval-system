@@ -12,18 +12,20 @@ Just a simple approval system written in Python and deployed using Lambda + API 
 - Test using postman.
 
 ## Technical Details
+Create all services using 'lks' prefix, ex: lks-vpc
+
 ### VPC Networking
-Just create using the default process, 2 public and private subnet. Make sure you have a NAT Gateway configured. Create all services using lks- prefix
+Just create using the default process, 2 public and private subnet. Make sure you have a NAT Gateway configured. 
 
 ### Security
 There is only 1 things you need to concern about:
-- Make sure the RDS only receives traffic from the Lambda Function. Then you have 2 options, there! Figure it yourself!
+- Make sure the RDS only receives traffic from the Lambda Function. You have 2 options, figure it yourself!
 
 ### DB Instance
-To create a DB Instance in Academy Account, make sure you set it to sandbox mode. We will use MariaDB engine for now, set the username tp: admin and password: SnapanCCMenangLKSNasional. Make sure you create a subnet group first! Drop this RDS to the private subnets and make sure it uses your newly created Security Group.
+To create a DB Instance in Academy Account, make sure you set it to sandbox mode. We will use MariaDB engine for now, set the username to: admin, and password: SnapanCCMenangLKSNasional. Make sure you've created a subnet group before! Drop this RDS into the private subnets and make sure it uses your newly created Security Group.
 
 ### Lambdas
-There is 5 lambda function and each of them will have the same Environment Variables except lks_notify_email and lks_send_signal.
+There is 5 lambda functions and each of them will have the same Environment Variables except lks_notify_email and lks_send_signal.
 
 - lks_create_approval, lambda function to create a approval. The approval status will be set to pending in creation.
 - lks_get_approval, lambda function to get all approvals and their status.
@@ -32,7 +34,7 @@ There is 5 lambda function and each of them will have the same Environment Varia
 - lks_update_status, update the approval status to the decision.
 
 ### API Gateway
-You must configure a API Gateway REST API And set this routes and maps it into available lambda:
+You must configure a API Gateway REST API And set this routes and integrate it with the lambdas you've created before:
 - POST /approval -> lks_create_approval
 - GET /approval -> lks_get_approval
 - GET /approval/signal/{id} -> lks_send_signal
@@ -47,7 +49,7 @@ You must create a topic named ApprovalTopic, and for the subscriber, set it into
 - Third subscriber, Type must be: REPORT. Will receives report SNS regarding the Rejection of Approvals
 
 ### State Machine
-The important part of the State Machine is the waitForTaskToken attribute, which will BLOCKS the current Node and waiting for the sendSuccessTask signal. Node that have this waitForTaskToken attribute will receives a tasToken state, accessible via: $states.context.Task.Token for JSONata. The blocking Node will be at the 'Notify Email' State.
+The important part of the State Machine is the waitForTaskToken attribute, which will BLOCKS the current Node and waiting for the sendSuccessTask signal. Node that have this waitForTaskToken attribute will receives a tasToken state, accessible via: $states.context.Task.Token for JSONata. The TaskToken needs to be accessed at the first Node to ensure correctness of the flow.
 
 ### Test
-Now test, first you will create approval via the API. And then check the subscriber email, and finally there is option to reject or accept. Finally check the status by fetching GET /approval
+First you will create approval via the API. And then check the subscriber email, and finally there is option to reject or accept. Finally check the status by fetching GET /approval
