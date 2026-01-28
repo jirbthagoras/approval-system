@@ -34,7 +34,7 @@ There is 5 lambda functions and each of them will have the same Environment Vari
 - lks_update_status, update the approval status to the decision.
 
 ### API Gateway
-You must configure a API Gateway REST API And set this routes and integrate it with the lambdas you've created before:
+You must configure an API Gateway REST API And set this routes and integrate it with the lambdas you've created before:
 - POST /approval -> lks_create_approval
 - GET /approval -> lks_get_approval
 - GET /approval/signal/{id} -> lks_send_signal
@@ -42,7 +42,7 @@ You must configure a API Gateway REST API And set this routes and integrate it w
 Don't forget to activate CORS!
 
 ### SNS Topic and Subscription
-You must create a topic named ApprovalTopic, and for the subscriber, set it into 3 subscriber with different Subscription Filter Policy. As you can see in the code, the message will have a MessageAttribute named Type and the value will be depends on the sent signal. This is the Subscription Filter Policy:
+You must create a topic named ApprovalTopic, and for the subscriber, create 3 subscriber with different Subscription Filter Policy. As you can see in the code, the message will have a MessageAttribute named Type and the value will depends on the created approval's type. This is the Subscription Filter Policy:
 
 - First subscriber, Type must be: BUY. Subscriber will decides approval status of BUY Type
 - Second subscriber, Type must be: SALE. Subscriber will decides approval status of SALE Type
